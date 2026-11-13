@@ -1,0 +1,9 @@
+# Ignore sensitive personal PDFs and raw data dumps
+*.pdf
+*.py
+*.json
+!manifest.json
+maps_dump.html
+mobile_maps_dump.html
+.DS_Store
+Thumbs.db
