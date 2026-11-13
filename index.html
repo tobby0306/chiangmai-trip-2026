@@ -209,31 +209,36 @@
       </div>
     </section>
 
-    <!-- TAB 3: 住宿資料 (Hotels & Stay Info) -->
-    <section id="tab-hotel" class="tab-panel hidden p-4 space-y-4">
-      <div>
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          🏨 旅程住宿資料
-        </h2>
-        <p class="text-xs text-slate-400">入住須知、地址泰文卡（方便給司機看）、導航</p>
+    <!-- TAB 3: 機票與住宿 (Flights & Hotels Combined) -->
+    <section id="tab-hotel" class="tab-panel hidden p-4 space-y-6">
+      <!-- 住宿區段 -->
+      <div class="space-y-4">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            🏨 旅程住宿資料
+          </h2>
+          <p class="text-xs text-slate-400">入住須知、地址泰文卡（方便給司機看）、導航</p>
+        </div>
+
+        <div id="hotel-list" class="space-y-4">
+          <!-- Populated by JS -->
+        </div>
       </div>
 
-      <div id="hotel-list" class="space-y-4">
-        <!-- Populated by JS -->
-      </div>
-    </section>
+      <div class="border-t border-slate-800"></div>
 
-    <!-- TAB 4: 機票與行程 (Flights) -->
-    <section id="tab-flight" class="tab-panel hidden p-4 space-y-4">
-      <div>
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          ✈️ 來回航班資訊
-        </h2>
-        <p class="text-xs text-slate-400">出發抵達時間、航廈、行李額度與預訂代號</p>
-      </div>
+      <!-- 航班區段 -->
+      <div class="space-y-4">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            ✈️ 來回航班資訊
+          </h2>
+          <p class="text-xs text-slate-400">出發抵達時間、航廈、行李額度與預訂代號</p>
+        </div>
 
-      <div id="flight-container" class="space-y-4">
-        <!-- Populated by JS -->
+        <div id="flight-container" class="space-y-4">
+          <!-- Populated by JS -->
+        </div>
       </div>
     </section>
 
@@ -273,29 +278,25 @@
   </main>
 
   <!-- Bottom Navigation Bar -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-1 py-2 flex justify-around items-center">
-    <button onclick="switchTab('food')" id="nav-food" class="nav-btn flex flex-col items-center justify-center w-14 py-1 rounded-xl text-orange-500 transition active:scale-90">
-      <span class="text-lg">🍜</span>
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-2 py-2 flex justify-around items-center">
+    <button onclick="switchTab('food')" id="nav-food" class="nav-btn flex flex-col items-center justify-center w-16 py-1 rounded-xl text-orange-500 transition active:scale-90">
+      <span class="text-xl">🍜</span>
       <span class="text-[10px] font-medium mt-0.5">美食</span>
     </button>
-    <button onclick="switchTab('attractions')" id="nav-attractions" class="nav-btn flex flex-col items-center justify-center w-14 py-1 rounded-xl text-slate-400 transition active:scale-90">
-      <span class="text-lg">🐘</span>
+    <button onclick="switchTab('attractions')" id="nav-attractions" class="nav-btn flex flex-col items-center justify-center w-16 py-1 rounded-xl text-slate-400 transition active:scale-90">
+      <span class="text-xl">🐘</span>
       <span class="text-[10px] font-medium mt-0.5">景點</span>
     </button>
-    <button onclick="switchTab('ai')" id="nav-ai" class="nav-btn flex flex-col items-center justify-center w-14 py-1 rounded-xl text-slate-400 transition active:scale-90">
-      <span class="text-lg">🌟</span>
+    <button onclick="switchTab('ai')" id="nav-ai" class="nav-btn flex flex-col items-center justify-center w-16 py-1 rounded-xl text-slate-400 transition active:scale-90">
+      <span class="text-xl">🌟</span>
       <span class="text-[10px] font-medium mt-0.5">AI推薦</span>
     </button>
-    <button onclick="switchTab('hotel')" id="nav-hotel" class="nav-btn flex flex-col items-center justify-center w-14 py-1 rounded-xl text-slate-400 transition active:scale-90">
-      <span class="text-lg">🏨</span>
-      <span class="text-[10px] font-medium mt-0.5">住宿</span>
+    <button onclick="switchTab('hotel')" id="nav-hotel" class="nav-btn flex flex-col items-center justify-center w-16 py-1 rounded-xl text-slate-400 transition active:scale-90">
+      <span class="text-xl">🧳</span>
+      <span class="text-[10px] font-medium mt-0.5">機酒</span>
     </button>
-    <button onclick="switchTab('flight')" id="nav-flight" class="nav-btn flex flex-col items-center justify-center w-14 py-1 rounded-xl text-slate-400 transition active:scale-90">
-      <span class="text-lg">✈️</span>
-      <span class="text-[10px] font-medium mt-0.5">航班</span>
-    </button>
-    <button onclick="switchTab('menu')" id="nav-menu" class="nav-btn flex flex-col items-center justify-center w-14 py-1 rounded-xl text-slate-400 transition active:scale-90">
-      <span class="text-lg">📖</span>
+    <button onclick="switchTab('menu')" id="nav-menu" class="nav-btn flex flex-col items-center justify-center w-16 py-1 rounded-xl text-slate-400 transition active:scale-90">
+      <span class="text-xl">📖</span>
       <span class="text-[10px] font-medium mt-0.5">字典</span>
     </button>
   </nav>
