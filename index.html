@@ -124,7 +124,7 @@
 
       <!-- Filter Tags -->
       <div class="flex gap-2 overflow-x-auto no-scrollbar py-0.5">
-        <button onclick="filterFood('all')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-orange-500 text-white">全部</button>
+        <button onclick="filterFood('nearest')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-orange-500 text-white">📍 離我最近</button>
         <button onclick="filterFood('michelin')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">⭐ 米其林推薦</button>
         <button onclick="filterFood('古城區 (Old City)')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">🏯 古城區</button>
         <button onclick="filterFood('寧曼商圈 (Nimman)')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">☕ 寧曼商圈</button>
@@ -160,23 +160,50 @@
     </section>
 
     <!-- TAB 2: 旅遊體驗與市集 (Experiences & Markets) -->
-    <section id="tab-attractions" class="tab-panel hidden p-4 space-y-4">
-      <div>
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          🐘 景點體驗・市集・香氛 SPA
-        </h2>
-        <p class="text-xs text-slate-400">古寺秘境、大象友善營、按摩香氛與在地夜市</p>
+    <section id="tab-attractions" class="tab-panel hidden p-4 space-y-3.5">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            🐘 景點體驗・市集・香氛 SPA
+            <span id="attr-count" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700"></span>
+          </h2>
+          <p class="text-xs text-slate-400">古寺秘境、大象友善營、按摩香氛與在地夜市</p>
+        </div>
+        <button id="attr-view-toggle-btn" onclick="toggleAttractionView()" class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1.5 rounded-lg flex items-center gap-1 active:scale-95 transition">
+          📱 <span id="attr-view-toggle-text">切換清單</span>
+        </button>
       </div>
 
-      <!-- Sub Tabs: All / Temples & Nature / Markets / SPA -->
-      <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-        <button onclick="filterAttraction('all')" class="attr-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-orange-500 text-white">全部據點</button>
+      <!-- Sub Tabs: Nearest / Temples & Nature / Markets / SPA -->
+      <div class="flex gap-2 overflow-x-auto no-scrollbar py-0.5">
+        <button onclick="filterAttraction('nearest')" class="attr-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-orange-500 text-white">📍 離我最近</button>
         <button onclick="filterAttraction('attractions')" class="attr-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">🌿 自然與寺廟</button>
         <button onclick="filterAttraction('markets')" class="attr-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">🛍️ 市集夜市</button>
         <button onclick="filterAttraction('spa')" class="attr-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">💆 按摩・香氛</button>
       </div>
 
-      <div id="attraction-list" class="space-y-3">
+      <!-- Distance Reference Mode (Synced) -->
+      <div class="flex items-center justify-between bg-slate-800/80 border border-slate-700/60 p-2.5 rounded-xl text-xs">
+        <span class="text-slate-400">📏 測距基準點：</span>
+        <select id="attr-distance-ref-select" onchange="changeDistanceRef(this.value)" class="bg-slate-900 text-orange-400 border border-slate-700 rounded-lg px-2 py-1 text-xs focus:outline-none">
+          <option value="gps">📡 目前手機 GPS</option>
+          <option value="bed">🏨 BED 帕辛飯店 (古城)</option>
+          <option value="granary">🏡 The Granary (河畔莊園)</option>
+        </select>
+      </div>
+
+      <!-- Attraction Carousel Container (Swipeable) -->
+      <div id="attraction-carousel-view" class="space-y-2">
+        <div id="attraction-carousel" class="flex gap-4 overflow-x-auto no-scrollbar snap-carousel py-1 px-1">
+          <!-- Populated by JS -->
+        </div>
+        <div class="text-center text-xs text-slate-400">
+          👈 手指左右滑動查看不同景點 👉
+        </div>
+      </div>
+
+      <!-- Attraction List View -->
+      <div id="attraction-list-view" class="hidden space-y-3">
         <!-- Populated by JS -->
       </div>
     </section>
@@ -265,9 +292,11 @@
 
     let userLocation = null;
     let activeDistanceRef = 'gps';
-    let currentFoodFilter = 'all';
+    let currentFoodFilter = 'nearest';
+    let currentAttrFilter = 'nearest';
     let currentSearchTerm = '';
     let isFoodCarousel = true;
+    let isAttrCarousel = true;
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
       if (!lat1 || !lon1 || !lat2 || !lon2) return null;
@@ -285,6 +314,13 @@
       if (activeDistanceRef === 'bed') return COORDS_REF.bed;
       if (activeDistanceRef === 'granary') return COORDS_REF.granary;
       return userLocation || COORDS_REF.bed;
+    }
+
+    function getDistanceKm(coords) {
+      if (!coords || !coords.lat || !coords.lng) return 999999;
+      const ref = getActiveReferenceCoords();
+      const dist = calculateDistance(ref.lat, ref.lng, coords.lat, coords.lng);
+      return dist === null ? 999999 : dist;
     }
 
     function getDistanceString(coords) {
@@ -318,6 +354,10 @@
 
     function changeDistanceRef(val) {
       activeDistanceRef = val;
+      const foodSel = document.getElementById('distance-ref-select');
+      const attrSel = document.getElementById('attr-distance-ref-select');
+      if (foodSel) foodSel.value = val;
+      if (attrSel) attrSel.value = val;
       renderFood();
       renderAttractions();
     }
@@ -379,13 +419,16 @@
           const hay = `${p.name} ${p.sub_tag} ${p.specialty} ${p.desc} ${p.area}`.toLowerCase();
           if (!hay.includes(currentSearchTerm)) return false;
         }
-        if (currentFoodFilter === 'all') return true;
+        if (currentFoodFilter === 'nearest' || currentFoodFilter === 'all') return true;
         if (currentFoodFilter === 'michelin') return p.sub_tag.includes('米其林');
         if (currentFoodFilter === 'cafe') return p.sub_tag.includes('咖啡') || p.sub_tag.includes('茶') || p.sub_tag.includes('甜點') || p.sub_tag.includes('可可') || p.sub_tag.includes('煎餅') || p.sub_tag.includes('烘焙') || p.sub_tag.includes('早午餐');
         if (currentFoodFilter === 'noodle') return p.sub_tag.includes('金麵') || p.sub_tag.includes('泰北') || p.sub_tag.includes('泰菜');
         if (currentFoodFilter === p.area) return true;
         return false;
       });
+
+      // Always sort by distance ascending so nearest places come first!
+      filtered.sort((a, b) => getDistanceKm(a.coords) - getDistanceKm(b.coords));
 
       document.getElementById('food-count').innerText = `${filtered.length} 間`;
 
@@ -462,7 +505,23 @@
       `).join('');
     }
 
-    let currentAttrFilter = 'all';
+    function toggleAttractionView() {
+      isAttrCarousel = !isAttrCarousel;
+      const carouselView = document.getElementById('attraction-carousel-view');
+      const listView = document.getElementById('attraction-list-view');
+      const toggleText = document.getElementById('attr-view-toggle-text');
+
+      if (isAttrCarousel) {
+        carouselView.classList.remove('hidden');
+        listView.classList.add('hidden');
+        toggleText.innerText = '切換清單';
+      } else {
+        carouselView.classList.add('hidden');
+        listView.classList.remove('hidden');
+        toggleText.innerText = '切換滑卡';
+      }
+    }
+
     function filterAttraction(filter) {
       currentAttrFilter = filter;
       document.querySelectorAll('.attr-filter-btn').forEach(btn => {
@@ -477,12 +536,61 @@
     function renderAttractions() {
       const items = TRIP_DATA.places.filter(p => p.category !== 'food' && p.category !== 'service');
       const filtered = items.filter(p => {
-        if (currentAttrFilter === 'all') return true;
+        if (currentAttrFilter === 'nearest' || currentAttrFilter === 'all') return true;
         return p.category === currentAttrFilter;
       });
 
-      const container = document.getElementById('attraction-list');
-      container.innerHTML = filtered.map(item => `
+      // Sort by distance ascending
+      filtered.sort((a, b) => getDistanceKm(a.coords) - getDistanceKm(b.coords));
+
+      document.getElementById('attr-count').innerText = `${filtered.length} 處`;
+
+      const carousel = document.getElementById('attraction-carousel');
+      const list = document.getElementById('attraction-list-view');
+
+      carousel.innerHTML = filtered.map(item => `
+        <div class="snap-card min-w-[85vw] max-w-[88vw] bg-slate-800/90 border border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between shadow-xl space-y-3">
+          <div class="space-y-2.5">
+            <div class="flex items-start justify-between gap-2">
+              <span class="text-[10px] font-bold tracking-wide px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                ${item.sub_tag}
+              </span>
+              <span class="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">
+                ${getDistanceString(item.coords)}
+              </span>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-bold text-white tracking-tight leading-snug">
+                ${item.name}
+              </h3>
+              <div class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                <span>📍</span>
+                <span class="text-emerald-300 font-medium">${item.area}</span>
+              </div>
+            </div>
+
+            <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-2.5 space-y-1">
+              <p class="text-[11px] font-bold text-emerald-400">✨ 重點特色 / 體驗內容：</p>
+              <p class="text-xs text-slate-100 font-medium leading-relaxed">${item.specialty}</p>
+            </div>
+
+            <p class="text-xs text-slate-300 leading-relaxed">
+              💡 ${item.desc}
+            </p>
+          </div>
+
+          <div class="pt-1 space-y-2">
+            <p class="text-[10px] text-slate-500 truncate">地址：${item.address}</p>
+            <a href="${item.maps_url}" target="_blank" class="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-95 transition">
+              <span>🗺️</span>
+              <span>查看 Google 地圖位置</span>
+            </a>
+          </div>
+        </div>
+      `).join('');
+
+      list.innerHTML = filtered.map(item => `
         <div class="bg-slate-800/80 border border-slate-700/70 rounded-2xl p-4 space-y-3 shadow-lg">
           <div class="flex items-start justify-between gap-2">
             <div>
