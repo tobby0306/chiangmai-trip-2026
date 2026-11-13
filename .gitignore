@@ -1,9 +1,6 @@
-# Ignore sensitive personal PDFs and raw data dumps
-*.pdf
-*.py
-*.json
-!manifest.json
-maps_dump.html
-mobile_maps_dump.html
+# Ignore local folders (personal PDFs, scripts, and raw data)
+docs/
+scripts/
+data/
 .DS_Store
 Thumbs.db
