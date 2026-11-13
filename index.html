@@ -26,12 +26,6 @@
               500: '#f97316',
               600: '#ea580c',
               700: '#c2410c'
-            },
-            thai: {
-              gold: '#f59e0b',
-              jade: '#10b981',
-              lotus: '#ec4899',
-              wood: '#854d0e'
             }
           }
         }
@@ -39,14 +33,12 @@
     }
   </script>
   <style>
-    /* iOS Safe Area */
     body {
       padding-top: env(safe-area-inset-top);
       padding-bottom: calc(env(safe-area-inset-bottom) + 70px);
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
-    /* Hide scrollbar for clean UI */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -54,7 +46,6 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* Snap carousel */
     .snap-carousel {
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
@@ -111,29 +102,35 @@
   <main class="flex-1 overflow-y-auto no-scrollbar">
 
     <!-- TAB 1: 餐廳美食 (Swipeable Carousel & Filter) -->
-    <section id="tab-food" class="tab-panel p-4 space-y-4">
+    <section id="tab-food" class="tab-panel p-4 space-y-3.5">
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-lg font-bold text-white flex items-center gap-2">
             🍜 清邁精選美食
             <span id="food-count" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700"></span>
           </h2>
-          <p class="text-xs text-slate-400">左右滑動切換店家，附一鍵 Google 地圖導航</p>
+          <p class="text-xs text-slate-400">每間皆附主打菜色、簡介與 Google 導航</p>
         </div>
-        <!-- View Toggle (Carousel vs List) -->
-        <button id="view-toggle-btn" onclick="toggleFoodView()" class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1.5 rounded-lg flex items-center gap-1">
+        <button id="view-toggle-btn" onclick="toggleFoodView()" class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1.5 rounded-lg flex items-center gap-1 active:scale-95 transition">
           📱 <span id="view-toggle-text">切換清單</span>
         </button>
       </div>
 
+      <!-- Search Bar -->
+      <div class="relative">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+        <input type="text" id="food-search" oninput="onSearchInput(this.value)" placeholder="搜尋菜名、店名 (如：金麵、米其林、咖啡、煎餅...)" class="w-full bg-slate-800/90 border border-slate-700/80 text-white text-xs rounded-xl pl-8 pr-3 py-2.5 focus:outline-none focus:border-orange-500 placeholder:text-slate-500">
+      </div>
+
       <!-- Filter Tags -->
-      <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-        <button onclick="filterFood('all')" class="food-filter-btn active-filter px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-orange-500 text-white">全部 (All)</button>
+      <div class="flex gap-2 overflow-x-auto no-scrollbar py-0.5">
+        <button onclick="filterFood('all')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-orange-500 text-white">全部</button>
+        <button onclick="filterFood('michelin')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">⭐ 米其林推薦</button>
         <button onclick="filterFood('古城區 (Old City)')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">🏯 古城區</button>
         <button onclick="filterFood('寧曼商圈 (Nimman)')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">☕ 寧曼商圈</button>
+        <button onclick="filterFood('cafe')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">🍰 咖啡甜點</button>
+        <button onclick="filterFood('noodle')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">🍜 金麵/泰北菜</button>
         <button onclick="filterFood('河畔/住宿周邊 (San Phi Suea)')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">🏡 住宿周邊</button>
-        <button onclick="filterFood('泰北金麵')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">🍜 金麵必吃</button>
-        <button onclick="filterFood('文青咖啡甜點')" class="food-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">🍰 咖啡甜點</button>
       </div>
 
       <!-- Distance Reference Mode -->
@@ -148,7 +145,7 @@
 
       <!-- Food Carousel Container (Swipeable) -->
       <div id="food-carousel-view" class="space-y-2">
-        <div id="food-carousel" class="flex gap-4 overflow-x-auto no-scrollbar snap-carousel py-2 px-1">
+        <div id="food-carousel" class="flex gap-4 overflow-x-auto no-scrollbar snap-carousel py-1 px-1">
           <!-- Populated by JS -->
         </div>
         <div id="carousel-indicator" class="text-center text-xs text-slate-400">
@@ -166,17 +163,17 @@
     <section id="tab-attractions" class="tab-panel hidden p-4 space-y-4">
       <div>
         <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          🐘 景點體驗與特色市集
+          🐘 景點體驗・市集・香氛 SPA
         </h2>
-        <p class="text-xs text-slate-400">古寺秘境、大象友善營、泰式按摩 SPA 與在地夜市</p>
+        <p class="text-xs text-slate-400">古寺秘境、大象友善營、按摩香氛與在地夜市</p>
       </div>
 
       <!-- Sub Tabs: All / Temples & Nature / Markets / SPA -->
       <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-        <button onclick="filterAttraction('all')" class="attr-filter-btn active-attr-filter px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-orange-500 text-white">全部景點</button>
+        <button onclick="filterAttraction('all')" class="attr-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-orange-500 text-white">全部據點</button>
         <button onclick="filterAttraction('attractions')" class="attr-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">🌿 自然與寺廟</button>
         <button onclick="filterAttraction('markets')" class="attr-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">🛍️ 市集夜市</button>
-        <button onclick="filterAttraction('spa')" class="attr-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">💆 按摩 SPA</button>
+        <button onclick="filterAttraction('spa')" class="attr-filter-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700">💆 按摩・香氛</button>
       </div>
 
       <div id="attraction-list" class="space-y-3">
@@ -259,23 +256,22 @@
 
   <!-- Application Script & Data Logic -->
   <script>
-    const TRIP_DATA = {"flight_info": {"outbound": {"airline": "亞洲航空 Thai AirAsia", "flight_no": "FD 243", "class": "經濟艙 (Economy)", "booking_code": "GD264T", "departure": {"airport": "台北桃園 (TPE) 航廈 1", "time": "2026/12/19 (週六) 18:55", "timezone": "GMT+8"}, "arrival": {"airport": "清邁國際機場 (CNX) 航廈 2", "time": "2026/12/19 (週六) 22:00", "timezone": "GMT+7"}, "duration": "4小時 5分鐘 (直飛不停站)", "passengers": [{"name": "Chien Hsin Lin", "seat": "1F", "baggage": "託運 20kg + 手提 7kg"}, {"name": "Chia Hsien Lin", "seat": "1E", "baggage": "託運 20kg + 手提 7kg"}]}, "inbound": {"airline": "星宇航空 STARLUX", "flight_no": "JX 752", "class": "商務/經濟 (Class X)", "booking_code": "EGGDWU", "ticket_no": "189 2103126276", "departure": {"airport": "清邁國際機場 (CNX) 國際航廈", "time": "2026/12/26 (週六) 16:55", "timezone": "GMT+7"}, "arrival": {"airport": "台北桃園 (TPE) 航廈 2", "time": "2026/12/26 (週六) 21:20", "timezone": "GMT+8"}, "duration": "3小時 25分鐘 (直飛不停站)", "passengers": [{"name": "Chia Hsien Lin Ms", "seat": "預選/商務禮遇", "baggage": "2PC (每人2件)"}, {"name": "Chien Hsin Lin", "seat": "預選/商務禮遇", "baggage": "2PC (每人2件)"}]}}, "hotel_info": [{"id": "hotel_1", "name_zh": "帕辛貝德飯店 (僅限成人)", "name_en": "BED Phrasingh - Adult Only", "name_th": "เบด พระสิงห์ - สำหรับผู้ใหญ่เท่านั้น", "dates": "2026/12/19 (六) - 12/20 (日) ｜ 1晚", "checkin": "12/19 晚間抵達 (有24hr櫃檯)", "checkout": "12/20 中午 12:00 前", "booking_id": "Agoda #1702574887", "client": "CHIEN HSIN LIN", "room_type": "Standard Double Room (大床房/禁菸)", "price_thb": "THB 2,682.06", "address": "Samlan Road Soi 1 Tambon Phra Singh, Amphur Muang, Old City, Chiang Mai 50200", "address_th": "ถนนสามล้าน ซอย 1 ตำบลพระสิงห์ อำเภอเมือง, เขตเมืองเก่า, เชียงใหม่ 50200", "phone": "+66 94 636 6171", "coords": {"lat": 18.788, "lng": 98.9825}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7880,98.9825", "highlights": ["近帕辛寺 (步行2分鐘)", "免費豐盛早餐", "無限享用免費瓶裝水與 Mini-Bar", "成人專屬安靜舒適"]}, {"id": "hotel_2", "name_zh": "河畔景觀糧倉渡假屋 5號房", "name_en": "The Granary Chiangmai (River view) 5", "name_th": "เดอะ แกรนารี เชียงใหม่ รีสอร์ท", "dates": "2026/12/20 (日) - 12/26 (六) ｜ 6晚", "checkin": "12/20 下午 15:00 起", "checkout": "12/26 中午 12:00 前", "booking_id": "Airbnb #HM4JS9MZT2", "host": "Vasupat", "room_type": "獨立木屋獨棟套房 (河景花園景觀)", "total_twd": "NT$ 14,638.46", "address": "The Granary Resort San phi sua, 120 M.6, San Phi Suea Rd, Chiang Mai 50300", "address_th": "120 ม.6 ถนนสันผีเสื้อ, San Phi Suea, เชียงใหม่ 50300", "phone": "Airbnb 聯繫房東 Vasupat", "coords": {"lat": 18.8471, "lng": 98.9869}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8471,98.9869", "highlights": ["寧靜河畔自然莊園", "大片草皮綠意與泳池", "房東熱情親切", "距離古城車程約 15-20 分鐘"]}], "thai_menu": [{"zh": "泰北金麵 (咖哩麵)", "en": "Khao Soi", "th": "ข้าวซอย", "pronounce": "靠水 / Kao-Soy", "desc": "清邁最具代表性料理！濃郁黃咖哩椰奶湯底配黃色雞蛋麵，上方放酥脆炸麵條，佐酸菜、紅蔥頭與檸檬汁。", "must_try": ["Khao Soi Khun Yai", "烤山尼曼", "Huen Muan Jai"]}, {"zh": "泰北香腸", "en": "Sai Oua", "th": "ไส้อั่ว", "pronounce": "賽歐 / Sai-Ua", "desc": "以豬絞肉拌入紅咖哩醬、檸檬草、南薑與青蔥炭火燻烤，香氣濃烈帶微辣感，瓦洛洛市場必買。", "must_try": ["瓦洛洛市場", "CHUM Northern Kitchen", "Huen Muan Jai"]}, {"zh": "杭蕾咖哩 (泰北緬甸咖哩燉肉)", "en": "Gaeng Hang Lay", "th": "แกงฮังเล", "pronounce": "耿杭蕾 / Gaeng-Hang-Lay", "desc": "受緬甸文化影響的溫和咖哩燉五花肉，口感酸甜微辣，肉質燉至軟嫩化口，極度下飯。", "must_try": ["Baan Landai", "CHUM Northern Kitchen"]}, {"zh": "泰北青辣椒沾醬 + 炸豬皮", "en": "Nam Prik Num & Kep Moo", "th": "น้ำพริกหนุ่ม + แคบหมู", "pronounce": "南霹農 + 嗑母", "desc": "炭烤青辣椒搗碎製成的靈魂沾醬，搭配酥脆不油膩的炸豬皮與時蔬，清邁餐桌必備前菜！", "must_try": ["瓦洛洛市場", "Huen Muan Jai"]}, {"zh": "紅辣椒番茄肉醬 (配時蔬)", "en": "Nam Prik Ong", "th": "น้ำพริกอ่อง", "pronounce": "南霹翁 / Nam-Prik-Ong", "desc": "用豬絞肉、小番茄和乾辣椒慢炒的溫和沾醬，酸甜濃郁像泰式肉醬肉汁，怕辣者也能享用。", "must_try": ["Huen Muan Jai", "Kat's Kitchen"]}, {"zh": "芒果糯米飯", "en": "Mango Sticky Rice", "th": "ข้าวเหนียวมะม่วง", "pronounce": "靠捏芒蒙 / Kao-Niew-Ma-Muang", "desc": "香甜水仙芒果配溫熱椰奶蒸糯米，撒上香脆綠豆仁，泰國不敗甜點之王。", "must_try": ["Mana's Best Mango Sticky Rice", "古城夜市攤"]}, {"zh": "香蕉煎餅", "en": "Roti", "th": "โรตี", "pronounce": "羅替 / Roh-Tee", "desc": "薄脆麵皮包裹香蕉切片，煎至金黃酥脆後淋上煉乳或巧克力醬。", "must_try": ["Roti Pa Dae (米其林推薦)", "Guu Fusion Roti & Tea"]}, {"zh": "泰式酸辣冬陰功湯", "en": "Tom Yum Goong", "th": "ต้มยำกุ้ง", "pronounce": "東央貢 / Tom-Yum-Goong", "desc": "經典南洋酸辣蝦湯，香茅、檸檬葉、南薑與鮮蝦交織的開胃名湯。", "must_try": ["Kat's Kitchen", "Baan Landai"]}, {"zh": "泰式奶茶 (冰)", "en": "Thai Iced Tea", "th": "ชาไทยเย็น", "pronounce": "差泰煙 / Cha-Thai-Yen", "desc": "濃郁手標茶香搭配煉乳與碎冰，清涼消暑。", "must_try": ["Guu Fusion Roti & Tea", "Tai Toon Baan"]}, {"zh": "泰式陶鍋火鍋", "en": "Jim Jum", "th": "จิ้มจุ่ม", "pronounce": "浸準 / Jim-Jum", "desc": "陶土小鍋裝盛泰式香草清甜高湯，涮入豬肉片、蔬菜與冬粉，搭配特調酸辣沾醬。", "must_try": ["Mooyim JimJum Hotpot Restaurant"]}], "places": [{"name": "Jok Sompet Dim Sum", "category": "food", "sub_tag": "清邁元氣早餐", "area": "古城區 (Old City)", "address": "59 3 Sri Poom Rd Old City Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.795106099999998, "lng": 98.9897955}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.795106099999998,98.9897955"}, {"name": "Suan Dok Porridge", "category": "food", "sub_tag": "清邁元氣早餐", "area": "古城區 (Old City)", "address": "QXRH+297 Old City Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7900383, "lng": 98.97841729999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7900383,98.97841729999999"}, {"name": "Tai Toon Baan", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "59, 1-2 Chang Moi Kao Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.7917423, "lng": 98.99533579999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7917423,98.99533579999999"}, {"name": "97% Nothing But Cocoa", "category": "food", "sub_tag": "文青咖啡甜點", "area": "古城區 (Old City)", "address": "97% Nothing But Cocoa 69/6 Intrawarorot Rd, Tambon Si Phum, เมือง Chiang Mai 50200泰國", "coords": {"lat": 18.7895268, "lng": 98.9836639}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7895268,98.9836639"}, {"name": "Wat Pha Lat", "category": "attractions", "sub_tag": "經典景點與體驗", "area": "清邁市區", "address": "บ้านห้วยผาลาด 101, Sriwichai Alley, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7993968, "lng": 98.9341468}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7993968,98.9341468"}, {"name": "Artisan sourdough by apple fahey", "category": "food", "sub_tag": "在地人氣美食", "area": "清邁市區", "address": "113, 12 Soi 16 Chanhom, Suthep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7806911, "lng": 98.9542038}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7806911,98.9542038"}, {"name": "Roti Pa Dae", "category": "food", "sub_tag": "泰式香蕉煎餅", "area": "瓦洛洛/湄濱河東岸", "address": "Tha Phae Road, Chang Moi Sub-district, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.7880529, "lng": 98.9958939}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7880529,98.9958939"}, {"name": "Meena Rice Based Cuisine", "category": "food", "sub_tag": "在地人氣美食", "area": "清邁市區", "address": "泰國 Chiang Mai, Amphoe San Kamphaeng, San Klang", "coords": {"lat": 18.7846357, "lng": 99.0458914}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7846357,99.0458914"}, {"name": "Huen Muan Jai", "category": "food", "sub_tag": "在地人氣美食", "area": "清邁市區", "address": "24 Ratchaphuek Alley, Tambon Chang Phueak, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.7998606, "lng": 98.9755988}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7998606,98.9755988"}, {"name": "CHAWEE", "category": "food", "sub_tag": "在地人氣美食", "area": "清邁市區", "address": "84/20, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.8258178, "lng": 98.97946569999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8258178,98.97946569999999"}, {"name": "Baan Landai Fine Thai Cuisine", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "252 13 Prapokklao Road, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7940346, "lng": 98.98747709999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7940346,98.98747709999999"}, {"name": "หมูยิ้มจิ้มจุ่ม2 SoGrill. Mooyimjimjoom2 Sogrill", "category": "food", "sub_tag": "在地人氣美食", "area": "清邁市區", "address": "60, 1 Taewan Rd, Chang Phueak, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.8051918, "lng": 98.97702819999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8051918,98.97702819999999"}, {"name": "Mooyim JimJum Hotpot Restaurant", "category": "food", "sub_tag": "在地人氣美食", "area": "清邁市區", "address": "5, 2 Taewan Rd, Chang Phueak, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.8057894, "lng": 98.9732267}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8057894,98.9732267"}, {"name": "CHUM Northern Kitchen @Old City", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "24 พระสิงห์ Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7897002, "lng": 98.9838348}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7897002,98.9838348"}, {"name": "Guu Fusion Roti & Tea", "category": "food", "sub_tag": "泰式香蕉煎餅", "area": "寧曼商圈 (Nimman)", "address": "15/4 Nimmana Haeminda Rd Lane 3, Suthep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.799099, "lng": 98.9672528}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.799099,98.9672528"}, {"name": "Kat's Kitchen", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "17 Ratchamanka Rd, Tambon Phra Sing, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7850741, "lng": 98.9922522}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7850741,98.9922522"}, {"name": "烤山尼曼 泰北咖哩麵", "category": "food", "sub_tag": "泰北金麵", "area": "寧曼商圈 (Nimman)", "address": "22 Nimmana Haeminda Rd Lane 7, Tambon Su Thep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7978999, "lng": 98.9692773}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7978999,98.9692773"}, {"name": "Lookbua thai food Restaurant", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "47, 5 Samlan Soi 7, Tambon Phra Sing, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.785350599999997, "lng": 98.9821564}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.785350599999997,98.9821564"}, {"name": "Sukon สุคนธ์", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "3 8 Samlarn Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7880517, "lng": 98.98250879999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7880517,98.98250879999999"}, {"name": "The Granary Chiangmai", "category": "food", "sub_tag": "在地人氣美食", "area": "河畔/住宿周邊 (San Phi Suea)", "address": "120 หมู่ 6 ถนน สันผีเสื้อ, San Phi Suea, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.8471162, "lng": 98.9869125}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8471162,98.9869125"}, {"name": "Akha Ama Coffee ( The New Original )", "category": "food", "sub_tag": "文青咖啡甜點", "area": "古城區 (Old City)", "address": "moonmueang soi 9 Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.794007, "lng": 98.9925683}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.794007,98.9925683"}, {"name": "Akha Ama Phrasingh", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "175 2 Rachadamnoen Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7883802, "lng": 98.9832131}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7883802,98.9832131"}, {"name": "Friend's Table (reservations required)", "category": "food", "sub_tag": "在地人氣美食", "area": "杭東區 (Hang Dong)", "address": "125, Hang Dong, Chiang Mai, 50230泰國", "coords": {"lat": 18.7033883, "lng": 98.9091995}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7033883,98.9091995"}, {"name": "GLeams GArden & COffee", "category": "food", "sub_tag": "在地人氣美食", "area": "河畔/住宿周邊 (San Phi Suea)", "address": "9 1, San Phi Suea, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.849864399999998, "lng": 98.9885449}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.849864399999998,98.9885449"}, {"name": "Baked by Win", "category": "food", "sub_tag": "在地人氣美食", "area": "河畔/住宿周邊 (San Phi Suea)", "address": "200, 88 Soi Mu Ban Rim Nam, San Phi Suea, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.838480699999998, "lng": 99.0106982}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.838480699999998,99.0106982"}, {"name": "Mana's Best Mango Sticky Rice", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "เลขที่ หน้าโรงเรียนยุพราช Ratvithi Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7906549, "lng": 98.98928149999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7906549,98.98928149999999"}, {"name": "Terroir Roasters", "category": "food", "sub_tag": "文青咖啡甜點", "area": "杭東區 (Hang Dong)", "address": "252, Nong Kwai, Hang Dong District, Chiang Mai 50230泰國", "coords": {"lat": 18.7247078, "lng": 98.922606}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7247078,98.922606"}, {"name": "Wat Intharawat (Wat Ton Kwen)", "category": "attractions", "sub_tag": "經典景點與體驗", "area": "杭東區 (Hang Dong)", "address": "PWFG+45F บ้านต้นเกว๋น ซอย 3 Nong Kwai, Hang Dong District, Chiang Mai 50230泰國", "coords": {"lat": 18.722841499999998, "lng": 98.9254437}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.722841499999998,98.9254437"}, {"name": "Chai Lai Orchid Eco Lodge and Cafe", "category": "attractions", "sub_tag": "經典景點與體驗", "area": "清邁市區", "address": "172 m 5 T. Mae Sapok A, Mae Wang District, Chiang Mai 50360泰國", "coords": {"lat": 18.658269699999998, "lng": 98.63375289999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.658269699999998,98.63375289999999"}, {"name": "Lanna Elephant Care", "category": "attractions", "sub_tag": "經典景點與體驗", "area": "杭東區 (Hang Dong)", "address": "119/101 Hang Dong District, Chiang Mai 50230泰國", "coords": {"lat": 18.761949599999998, "lng": 98.8744802}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.761949599999998,98.8744802"}, {"name": "Coconut Market", "category": "markets", "sub_tag": "特色市集與夜市", "area": "河畔/住宿周邊 (San Phi Suea)", "address": "94 หมู่ที่ 3 ซอย บ้านโต้ง 2, Fa Ham, Mueang Chiang Mai District, Chiang Mai 50000泰國", "coords": {"lat": 18.8177712, "lng": 99.0101074}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8177712,99.0101074"}, {"name": "Proudproudproud", "category": "attractions", "sub_tag": "經典景點與體驗", "area": "山區秘境 (Mae Kampong)", "address": "23 Mae On District, Chiang Mai 50130泰國", "coords": {"lat": 18.865852699999998, "lng": 99.3483818}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.865852699999998,99.3483818"}, {"name": "美斯樂", "category": "food", "sub_tag": "在地人氣美食", "area": "清邁市區", "address": "57110泰國清萊府湄法鑾縣 Mae Salong Nok, 美斯樂", "coords": {"lat": 20.1862897, "lng": 99.59364629999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=20.1862897,99.59364629999999"}, {"name": "黑森林餐廳", "category": "food", "sub_tag": "在地人氣美食", "area": "杭東區 (Hang Dong)", "address": "Ratchapruek Rd, Nong Kwai, Hang Dong District, Chiang Mai 50230泰國", "coords": {"lat": 18.729941999999998, "lng": 98.9435826}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.729941999999998,98.9435826"}, {"name": "瓦洛洛市場", "category": "markets", "sub_tag": "特色市集與夜市", "area": "瓦洛洛/湄濱河東岸", "address": "10,12, 14 Wichayanon Rd, Chang Moi Sub-district, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.789737799999997, "lng": 99.000695}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.789737799999997,99.000695"}, {"name": "กาดวิวดอย : Kard View Doi", "category": "markets", "sub_tag": "特色市集與夜市", "area": "寧曼商圈 (Nimman)", "address": "293 2 Chiang Rai Rd, Tambon Su Thep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.794868299999997, "lng": 98.96310629999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.794868299999997,98.96310629999999"}, {"name": "Siri Money Exchange, CURRENCY EXCHANGE.ร้านแลกเงิน สิริ มันนี่ เอ็กซ์เชนจ์", "category": "service", "sub_tag": "實用設施", "area": "清邁市區", "address": "61 Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7838575, "lng": 98.9903976}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7838575,98.9903976"}, {"name": "Copenn Chiangmai", "category": "food", "sub_tag": "在地人氣美食", "area": "寧曼商圈 (Nimman)", "address": "24 9 2nd floor Tambon Su Thep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7948614, "lng": 98.96851389999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7948614,98.96851389999999"}, {"name": "V Secret Vegan", "category": "food", "sub_tag": "在地人氣美食", "area": "瓦洛洛/湄濱河東岸", "address": "28/3-4 Changklan Rd, Tambon Chang Moi, Mueang Chiang Mai District, Chiang Mai 50100泰國", "coords": {"lat": 18.7868697, "lng": 99.00048729999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7868697,99.00048729999999"}, {"name": "Ruen Tamarind Restaurant", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "50 Rachadamnoen Rd Soi 1, Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.78857, "lng": 98.9897846}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.78857,98.9897846"}, {"name": "Herb Basics", "category": "spa", "sub_tag": "泰式按摩 & SPA", "area": "古城區 (Old City)", "address": "174 Prapokklao Road, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7884284, "lng": 98.9880213}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7884284,98.9880213"}, {"name": "Mae Kha Canal", "category": "attractions", "sub_tag": "經典景點與體驗", "area": "清邁市區", "address": "9 Sridonchai Rd, Haiya Sub-district, Mueang Chiang Mai District, Chiang Mai 50100泰國", "coords": {"lat": 18.777065699999998, "lng": 98.9955681}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.777065699999998,98.9955681"}, {"name": "真心茶屋", "category": "food", "sub_tag": "在地人氣美食", "area": "瓦洛洛/湄濱河東岸", "address": "191/1 Sridonchai Rd, Chang Khlan Sub-district, Mueang Chiang Mai District, Chang Wat Chiang Mai 50100泰國", "coords": {"lat": 18.7812993, "lng": 99.00124129999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7812993,99.00124129999999"}, {"name": "週五雲南早市", "category": "markets", "sub_tag": "特色市集與夜市", "area": "瓦洛洛/湄濱河東岸", "address": "ท่าแพ ซอย 1 Chang Khlan Sub-district, Mueang Chiang Mai District, Chiang Mai 50100泰國", "coords": {"lat": 18.787469299999998, "lng": 98.9998789}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.787469299999998,98.9998789"}, {"name": "Garden to Table Chiangmai", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "136 4 Ratchapakhinai Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7865085, "lng": 98.9904282}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7865085,98.9904282"}, {"name": "Thai Food Good Taste - Chiang Mai", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "Rachadamnoen Rd, Tambon Si Phum, เมือง Chiang Mai 50200泰國", "coords": {"lat": 18.7883228, "lng": 98.9868224}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7883228,98.9868224"}, {"name": "Zira Spa", "category": "spa", "sub_tag": "泰式按摩 & SPA", "area": "古城區 (Old City)", "address": "8, 1 Ratvithi Rd, Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7904774, "lng": 98.99289519999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7904774,98.99289519999999"}, {"name": "TEMPT cafe&brunch", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "Ratchapakhinai Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7919892, "lng": 98.99002399999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7919892,98.99002399999999"}, {"name": "Ton Lam Yai Market", "category": "markets", "sub_tag": "特色市集與夜市", "area": "瓦洛洛/湄濱河東岸", "address": "88/1 Wichayanon Rd, Chang Moi Sub-district, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.7902745, "lng": 99.0013087}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7902745,99.0013087"}, {"name": "Ming Muang Market", "category": "markets", "sub_tag": "特色市集與夜市", "area": "古城區 (Old City)", "address": "131/3 Mun Mueang Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.7916557, "lng": 98.9932032}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7916557,98.9932032"}, {"name": "Mae Kampong Village", "category": "attractions", "sub_tag": "經典景點與體驗", "area": "山區秘境 (Mae Kampong)", "address": "V982+695, Huai Kaeo, Mae On District, Chiang Mai 50130泰國", "coords": {"lat": 18.8655073, "lng": 99.35098459999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8655073,99.35098459999999"}, {"name": "Kuaytiaw 3 Baht", "category": "food", "sub_tag": "在地人氣美食", "area": "瓦洛洛/湄濱河東岸", "address": "R225+JRM, Rattanakosin Soi 1, Tambon Wat Ket, Mueang Chiang Mai District, Chiang Mai 50000泰國", "coords": {"lat": 18.801571799999998, "lng": 99.0095923}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.801571799999998,99.0095923"}, {"name": "Baan Suan Café", "category": "food", "sub_tag": "在地人氣美食", "area": "清邁市區", "address": "170 หมู่ที่ 3 ถนน แม่เหียะ-บ้านปง Mae Hia, Mueang Chiang Mai District, Chiang Mai 50100泰國", "coords": {"lat": 18.7595737, "lng": 98.9137356}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7595737,98.9137356"}, {"name": "OHB Cafe and Meal - Chiang Mai", "category": "food", "sub_tag": "文青咖啡甜點", "area": "瓦洛洛/湄濱河東岸", "address": "88/8 ถนน บำรุงราษฎร์ Wat Ket, Mueang Chiang Mai District, Chiang Mai 50000泰國", "coords": {"lat": 18.790176199999998, "lng": 99.0088756}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.790176199999998,99.0088756"}, {"name": "Phailin Tok sen massage", "category": "spa", "sub_tag": "泰式按摩 & SPA", "area": "古城區 (Old City)", "address": "20 Rachadamnoen Rd Soi 1, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7892109, "lng": 98.99220609999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7892109,98.99220609999999"}, {"name": "Ziri Massage and Spa", "category": "spa", "sub_tag": "泰式按摩 & SPA", "area": "古城區 (Old City)", "address": "Ratchapakhinai Rd, Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.786741799999998, "lng": 98.9902898}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.786741799999998,98.9902898"}, {"name": "Shan State food", "category": "food", "sub_tag": "在地人氣美食", "area": "清邁市區", "address": "Q2PW+3XC, San Klang, San Kamphaeng District, Chiang Mai 50130泰國", "coords": {"lat": 18.785190999999998, "lng": 99.04740299999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.785190999999998,99.04740299999999"}, {"name": "ครัวอ้อยใจ Aoyjai Kitchen", "category": "food", "sub_tag": "在地人氣美食", "area": "古城區 (Old City)", "address": "Phra Pok Klao Rd Soi 4, Tambon Phra Sing, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7833619, "lng": 98.98737489999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7833619,98.98737489999999"}, {"name": "Angkaew Reservoir", "category": "attractions", "sub_tag": "經典景點與體驗", "area": "寧曼商圈 (Nimman)", "address": "RX42+99C, Sukhothai 5 Alley, Tambon Su Thep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.8065843, "lng": 98.9517827}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8065843,98.9517827"}, {"name": "สุขพอดี - Simply Happy", "category": "food", "sub_tag": "在地人氣美食", "area": "瓦洛洛/湄濱河東岸", "address": "Osathaphan Rd, Tambon Wat Ket, Mueang Chiang Mai District, Chiang Mai 50000泰國", "coords": {"lat": 18.7837718, "lng": 99.00662539999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7837718,99.00662539999999"}, {"name": "AT KHUA LEK Cafe & Restaurant", "category": "food", "sub_tag": "文青咖啡甜點", "area": "瓦洛洛/湄濱河東岸", "address": "Wat Ket, Mueang Chiang Mai District, Chiang Mai 50000泰國", "coords": {"lat": 18.783294899999998, "lng": 99.0052214}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.783294899999998,99.0052214"}, {"name": "Light Beverage and MORE", "category": "food", "sub_tag": "在地人氣美食", "area": "瓦洛洛/湄濱河東岸", "address": "343/2 Charoen Prathet Rd, Chang Khlan Sub-district, Amphoe Mueang Chiang Mai, Chiang Mai 50100泰國", "coords": {"lat": 18.7693892, "lng": 99.00148399999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7693892,99.00148399999999"}, {"name": "清邁夜市", "category": "markets", "sub_tag": "特色市集與夜市", "area": "清邁市區", "address": "", "coords": {"lat": 18.7852244, "lng": 99.0002986}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7852244,99.0002986"}, {"name": "Khao Soi Khun Yai", "category": "food", "sub_tag": "泰北金麵", "area": "古城區 (Old City)", "address": "QXWM+47J, Sri Poom 8 Alley, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7953334, "lng": 98.9831462}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7953334,98.9831462"}, {"name": "KUNG YIM", "category": "food", "sub_tag": "在地人氣美食", "area": "清邁市區", "address": "", "coords": {"lat": 18.8038596, "lng": 98.97477219999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8038596,98.97477219999999"}]};
+    const TRIP_DATA = {"flight_info": {"outbound": {"airline": "亞洲航空 Thai AirAsia", "flight_no": "FD 243", "class": "經濟艙 (Economy)", "booking_code": "GD264T", "departure": {"airport": "台北桃園 (TPE) 航廈 1", "time": "2026/12/19 (週六) 18:55", "timezone": "GMT+8"}, "arrival": {"airport": "清邁國際機場 (CNX) 航廈 2", "time": "2026/12/19 (週六) 22:00", "timezone": "GMT+7"}, "duration": "4小時 5分鐘 (直飛不停站)", "passengers": [{"name": "Chien Hsin Lin", "seat": "1F", "baggage": "託運 20kg + 手提 7kg"}, {"name": "Chia Hsien Lin", "seat": "1E", "baggage": "託運 20kg + 手提 7kg"}]}, "inbound": {"airline": "星宇航空 STARLUX", "flight_no": "JX 752", "class": "商務/經濟 (Class X)", "booking_code": "EGGDWU", "ticket_no": "189 2103126276", "departure": {"airport": "清邁國際機場 (CNX) 國際航廈", "time": "2026/12/26 (週六) 16:55", "timezone": "GMT+7"}, "arrival": {"airport": "台北桃園 (TPE) 航廈 2", "time": "2026/12/26 (週六) 21:20", "timezone": "GMT+8"}, "duration": "3小時 25分鐘 (直飛不停站)", "passengers": [{"name": "Chia Hsien Lin Ms", "seat": "預選/商務禮遇", "baggage": "2PC (每人2件)"}, {"name": "Chien Hsin Lin", "seat": "預選/商務禮遇", "baggage": "2PC (每人2件)"}]}}, "hotel_info": [{"id": "hotel_1", "name_zh": "帕辛貝德飯店 (僅限成人)", "name_en": "BED Phrasingh - Adult Only", "name_th": "เบด พระสิงห์ - สำหรับผู้ใหญ่เท่านั้น", "dates": "2026/12/19 (六) - 12/20 (日) ｜ 1晚", "checkin": "12/19 晚間抵達 (有24hr櫃檯)", "checkout": "12/20 中午 12:00 前", "booking_id": "Agoda #1702574887", "client": "CHIEN HSIN LIN", "room_type": "Standard Double Room (大床房/禁菸)", "price_thb": "THB 2,682.06", "address": "Samlan Road Soi 1 Tambon Phra Singh, Amphur Muang, Old City, Chiang Mai 50200", "address_th": "ถนนสามล้าน ซอย 1 ตำบลพระสิงห์ อำเภอเมือง, เขตเมืองเก่า, เชียงใหม่ 50200", "phone": "+66 94 636 6171", "coords": {"lat": 18.788, "lng": 98.9825}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7880,98.9825", "highlights": ["近帕辛寺 (步行2分鐘)", "免費豐盛早餐", "無限享用免費瓶裝水與 Mini-Bar", "成人專屬安靜舒適"]}, {"id": "hotel_2", "name_zh": "河畔景觀糧倉渡假屋 5號房", "name_en": "The Granary Chiangmai (River view) 5", "name_th": "เดอะ แกรนารี เชียงใหม่ รีสอร์ท", "dates": "2026/12/20 (日) - 12/26 (六) ｜ 6晚", "checkin": "12/20 下午 15:00 起", "checkout": "12/26 中午 12:00 前", "booking_id": "Airbnb #HM4JS9MZT2", "host": "Vasupat", "room_type": "獨立木屋獨棟套房 (河景花園景觀)", "total_twd": "NT$ 14,638.46", "address": "The Granary Resort San phi sua, 120 M.6, San Phi Suea Rd, Chiang Mai 50300", "address_th": "120 ม.6 ถนนสันผีเสื้อ, San Phi Suea, เชียงใหม่ 50300", "phone": "Airbnb 聯繫房東 Vasupat", "coords": {"lat": 18.8471, "lng": 98.9869}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8471,98.9869", "highlights": ["寧靜河畔自然莊園", "大片草皮綠意與泳池", "房東熱情親切", "距離古城車程約 15-20 分鐘"]}], "thai_menu": [{"zh": "泰北金麵 (咖哩麵)", "en": "Khao Soi", "th": "ข้าวซอย", "pronounce": "靠水 / Kao-Soy", "desc": "清邁最具代表性料理！濃郁黃咖哩椰奶湯底配黃色雞蛋麵，上方放酥脆炸麵條，佐酸菜、紅蔥頭與檸檬汁。", "must_try": ["Khao Soi Khun Yai", "烤山尼曼", "Huen Muan Jai"]}, {"zh": "泰北香腸", "en": "Sai Oua", "th": "ไส้อั่ว", "pronounce": "賽歐 / Sai-Ua", "desc": "以豬絞肉拌入紅咖哩醬、檸檬草、南薑與青蔥炭火燻烤，香氣濃烈帶微辣感，瓦洛洛市場必買。", "must_try": ["瓦洛洛市場", "CHUM Northern Kitchen", "Huen Muan Jai"]}, {"zh": "杭蕾咖哩 (泰北緬甸咖哩燉肉)", "en": "Gaeng Hang Lay", "th": "แกงฮังเล", "pronounce": "耿杭蕾 / Gaeng-Hang-Lay", "desc": "受緬甸文化影響的溫和咖哩燉五花肉，口感酸甜微辣，肉質燉至軟嫩化口，極度下飯。", "must_try": ["Baan Landai", "CHUM Northern Kitchen"]}, {"zh": "泰北青辣椒沾醬 + 炸豬皮", "en": "Nam Prik Num & Kep Moo", "th": "น้ำพริกหนุ่ม + แคบหมู", "pronounce": "南霹農 + 嗑母", "desc": "炭烤青辣椒搗碎製成的靈魂沾醬，搭配酥脆不油膩的炸豬皮與時蔬，清邁餐桌必備前菜！", "must_try": ["瓦洛洛市場", "Huen Muan Jai"]}, {"zh": "紅辣椒番茄肉醬 (配時蔬)", "en": "Nam Prik Ong", "th": "น้ำพริกอ่อง", "pronounce": "南霹翁 / Nam-Prik-Ong", "desc": "用豬絞肉、小番茄和乾辣椒慢炒的溫和沾醬，酸甜濃郁像泰式肉醬肉汁，怕辣者也能享用。", "must_try": ["Huen Muan Jai", "Kat's Kitchen"]}, {"zh": "芒果糯米飯", "en": "Mango Sticky Rice", "th": "ข้าวเหนียวมะม่วง", "pronounce": "靠捏芒蒙 / Kao-Niew-Ma-Muang", "desc": "香甜水仙芒果配溫熱椰奶蒸糯米，撒上香脆綠豆仁，泰國不敗甜點之王。", "must_try": ["Mana's Best Mango Sticky Rice", "古城夜市攤"]}, {"zh": "香蕉煎餅", "en": "Roti", "th": "โรตี", "pronounce": "羅替 / Roh-Tee", "desc": "薄脆麵皮包裹香蕉切片，煎至金黃酥脆後淋上煉乳或巧克力醬。", "must_try": ["Roti Pa Dae (米其林推薦)", "Guu Fusion Roti & Tea"]}, {"zh": "泰式酸辣冬陰功湯", "en": "Tom Yum Goong", "th": "ต้มยำกุ้ง", "pronounce": "東央貢 / Tom-Yum-Goong", "desc": "經典南洋酸辣蝦湯，香茅、檸檬葉、南薑與鮮蝦交織的開胃名湯。", "must_try": ["Kat's Kitchen", "Baan Landai"]}, {"zh": "泰式奶茶 (冰)", "en": "Thai Iced Tea", "th": "ชาไทยเย็น", "pronounce": "差泰煙 / Cha-Thai-Yen", "desc": "濃郁手標茶香搭配煉乳與碎冰，清涼消暑。", "must_try": ["Guu Fusion Roti & Tea", "Tai Toon Baan"]}, {"zh": "泰式陶鍋火鍋", "en": "Jim Jum", "th": "จิ้มจุ่ม", "pronounce": "浸準 / Jim-Jum", "desc": "陶土小鍋裝盛泰式香草清甜高湯，涮入豬肉片、蔬菜與冬粉，搭配特調酸辣沾醬。", "must_try": ["Mooyim JimJum Hotpot Restaurant"]}], "places": [{"name": "Jok Sompet Dim Sum", "category": "food", "sub_tag": "24H 早餐・港點鹹粥", "area": "古城區 (Old City)", "address": "59 3 Sri Poom Rd Old City Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.795106099999998, "lng": 98.9897955}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.795106099999998,98.9897955", "specialty": "泰式鹹粥 (Jok)、蒸籠港點、肉骨茶、泰式奶茶", "desc": "古城北門知名 24 小時營業老店，隨時都能吃到熱騰騰的泰式滑蛋肉末粥與平價港點。"}, {"name": "Suan Dok Porridge", "category": "food", "sub_tag": "在地早宵・泰式鹹粥", "area": "古城區 (Old City)", "address": "QXRH+297 Old City Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7900383, "lng": 98.97841729999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7900383,98.97841729999999", "specialty": "傳統泰式豬肉粥、半熟蛋、油條、猪雜湯", "desc": "古城西側平價老字號鹹粥，湯頭清甜順口，適合當作清邁的元氣早餐或宵夜。"}, {"name": "Tai Toon Baan", "category": "food", "sub_tag": "老宅早午餐・咖啡", "area": "古城區 (Old City)", "address": "59, 1-2 Chang Moi Kao Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.7917423, "lng": 98.99533579999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7917423,98.99533579999999", "specialty": "泰式炭烤吐司、半熟蛋、經典泰式早餐盤、冰美式", "desc": "隱身木造老宅地下室的超人氣復古早午餐，氣氛溫馨文青，建議早點來免排隊。"}, {"name": "97% Nothing But Cocoa", "category": "food", "sub_tag": "手工可可專賣", "area": "古城區 (Old City)", "address": "97% Nothing But Cocoa 69/6 Intrawarorot Rd, Tambon Si Phum, เมือง Chiang Mai 50200泰國", "coords": {"lat": 18.7895268, "lng": 98.9836639}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7895268,98.9836639", "specialty": "泰北產地單品可可飲、濃郁生巧克力、冰沙", "desc": "主打泰國本土種植的可可豆，可選擇不同濃度的純可可飲與甜點，巧克力控必訪。"}, {"name": "Wat Pha Lat", "category": "attractions", "sub_tag": "素帖山・森林秘境古寺", "area": "清邁市區", "address": "บ้านห้วยผาลาด 101, Sriwichai Alley, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7993968, "lng": 98.9341468}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7993968,98.9341468", "specialty": "被青苔與溪流包圍的古老石雕佛像與蘭納佛塔", "desc": "隱藏在半山腰森林中的清幽古寺，不像雙龍寺人擠人，從僧侶步道走上來很有感。"}, {"name": "Artisan sourdough by apple fahey", "category": "food", "sub_tag": "手工酸種麵包・早午餐", "area": "清邁市區", "address": "113, 12 Soi 16 Chanhom, Suthep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7806911, "lng": 98.9542038}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7806911,98.9542038", "specialty": "天然發酵酸種麵包 (Sourdough)、司康、手工果醬、早午餐", "desc": "寧曼與素帖山腳下的隱藏版歐式烘焙坊，酸種麵包外酥內軟，口感道地。"}, {"name": "Roti Pa Dae", "category": "food", "sub_tag": "米其林必比登・香蕉煎餅", "area": "瓦洛洛/湄濱河東岸", "address": "Tha Phae Road, Chang Moi Sub-district, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.7880529, "lng": 98.9958939}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7880529,98.9958939", "specialty": "脆皮香蕉煎餅 (Roti)、煉乳巧克力煎餅、起司蛋煎餅", "desc": "塔佩門附近連續多年獲得米其林必比登推薦的排隊小攤，餅皮酥脆不油膩。"}, {"name": "Meena Rice Based Cuisine", "category": "food", "sub_tag": "米其林必比登・田園料理", "area": "清邁市區", "address": "泰國 Chiang Mai, Amphoe San Kamphaeng, San Klang", "coords": {"lat": 18.7846357, "lng": 99.0458914}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7846357,99.0458914", "specialty": "招牌五色有機米飯套餐、泰北燉肉、香草炸魚", "desc": "在綠油油稻田旁的木屋用餐，以蝶豆花、紅麴等天然食材染出五色米飯，好吃又好拍。"}, {"name": "Huen Muan Jai", "category": "food", "sub_tag": "米其林必比登・泰北菜", "area": "清邁市區", "address": "24 Ratchaphuek Alley, Tambon Chang Phueak, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.7998606, "lng": 98.9755988}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7998606,98.9755988", "specialty": "泰北拼盤 (炸豬皮/青辣醬/香腸)、泰北金麵、香蕉葉烤肉", "desc": "清邁極具代表性的傳統蘭納庭園餐廳，料理道地且價格親民，建議避開尖峰時段。"}, {"name": "CHAWEE", "category": "food", "sub_tag": "米其林必比登・預約制私廚", "area": "清邁市區", "address": "84/20, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.8258178, "lng": 98.97946569999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8258178,98.97946569999999", "specialty": "當代泰式主廚私房菜 (Chef's Table)、在地食材創意料理", "desc": "隱密溫馨的米其林推薦私廚，融合泰北食材與現代烹調手法，務必提前預約。"}, {"name": "Baan Landai Fine Thai Cuisine", "category": "food", "sub_tag": "米其林必比登・精緻泰菜", "area": "古城區 (Old City)", "address": "252 13 Prapokklao Road, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7940346, "lng": 98.98747709999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7940346,98.98747709999999", "specialty": "紅酒醬烤豬肋排、杭蕾咖哩、泰式柚子沙拉、蝶豆花飯", "desc": "古城人氣最高的精緻泰北菜餐廳之一，裝潢典雅，菜色精緻不踩雷，強烈建議訂位。"}, {"name": "หมูยิ้มจิ้มจุ่ม2 SoGrill. Mooyimjimjoom2 Sogrill", "category": "food", "sub_tag": "泰式炭烤・陶鍋火鍋", "area": "清邁市區", "address": "60, 1 Taewan Rd, Chang Phueak, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.8051918, "lng": 98.97702819999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8051918,98.97702819999999", "specialty": "泰式銅盤烤肉 (Mookata)、陶鍋小火鍋 (Jim Jum)、海鮮拼盤", "desc": "超平價熱鬧的在地宵夜炭烤火鍋店，一邊烤肉一邊煮蔬菜湯，CP 值極高。"}, {"name": "Mooyim JimJum Hotpot Restaurant", "category": "food", "sub_tag": "泰式陶鍋・平價火鍋", "area": "清邁市區", "address": "5, 2 Taewan Rd, Chang Phueak, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.8057894, "lng": 98.9732267}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8057894,98.9732267", "specialty": "泰式香草陶鍋 (Jim Jum)、醃豬肉片、特調酸辣沾醬", "desc": "主打傳統泰北陶土小火鍋，湯頭清甜帶有香茅與羅勒香氣，非常受當地人喜愛。"}, {"name": "CHUM Northern Kitchen @Old City", "category": "food", "sub_tag": "泰北料理・家常菜", "area": "古城區 (Old City)", "address": "24 พระสิงห์ Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7897002, "lng": 98.9838348}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7897002,98.9838348", "specialty": "泰北金麵 (Khao Soi)、杭蕾咖哩、泰北香腸拼盤", "desc": "古城帕辛寺附近的質感小館，環境舒適有冷氣，能輕鬆一次品嚐各式經典泰北菜。"}, {"name": "Guu Fusion Roti & Tea", "category": "food", "sub_tag": "寧曼必吃・香蕉煎餅茶飲", "area": "寧曼商圈 (Nimman)", "address": "15/4 Nimmana Haeminda Rd Lane 3, Suthep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.799099, "lng": 98.9672528}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.799099,98.9672528", "specialty": "酥脆香蕉煎餅、拉茶、泰式奶茶、創意鹹甜 Roti", "desc": "寧曼路超人氣聚會甜點店，提供數十種甜鹹口味的香蕉煎餅與特色泰式茶飲。"}, {"name": "Kat's Kitchen", "category": "food", "sub_tag": "平價泰式熱炒・人氣小館", "area": "古城區 (Old City)", "address": "17 Ratchamanka Rd, Tambon Phra Sing, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7850741, "lng": 98.9922522}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7850741,98.9922522", "specialty": "泰式炒河粉 (Pad Thai)、綠咖哩、芒果糯米飯、冬陰功", "desc": "古城區評價極高且平價的泰式家庭料理，份量足、出餐快、味道非常穩定。"}, {"name": "烤山尼曼 泰北咖哩麵", "category": "food", "sub_tag": "泰北金麵・排隊名店", "area": "寧曼商圈 (Nimman)", "address": "22 Nimmana Haeminda Rd Lane 7, Tambon Su Thep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7978999, "lng": 98.9692773}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7978999,98.9692773", "specialty": "海鮮/牛肉/雞腿泰北金麵 (Khao Soi)、泰式炸春捲", "desc": "寧曼路最知名的金麵專賣店 (Khao Soi Nimman)，湯頭濃郁香辣，口味選擇多。"}, {"name": "Lookbua thai food Restaurant", "category": "food", "sub_tag": "古城泰式家常菜", "area": "古城區 (Old City)", "address": "47, 5 Samlan Soi 7, Tambon Phra Sing, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.785350599999997, "lng": 98.9821564}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.785350599999997,98.9821564", "specialty": "咖哩炒蟹 (Poo Phad Pong)、烤鴨料理、鴨肉炒河粉、鐵板菜", "desc": "帕辛寺附近受旅客與當地人歡迎的溫馨泰菜小館，菜色均衡不死鹹。"}, {"name": "Sukon สุคนธ์", "category": "food", "sub_tag": "古城在地泰菜", "area": "古城區 (Old City)", "address": "3 8 Samlarn Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7880517, "lng": 98.98250879999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7880517,98.98250879999999", "specialty": "傳統泰式與東南亞家常菜、泰式熱炒、湯品", "desc": "古城巷弄內的低調小餐館，氣氛悠閒輕鬆，適合散步時順道吃頓簡餐。"}, {"name": "Akha Ama Coffee ( The New Original )", "category": "food", "sub_tag": "清邁精品咖啡・原創品牌", "area": "古城區 (Old City)", "address": "moonmueang soi 9 Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.794007, "lng": 98.9925683}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.794007,98.9925683", "specialty": "阿卡族單品手沖咖啡、Manee Mana (橘子濃縮咖啡)", "desc": "清邁最具傳奇色彩的公平貿易精品咖啡品牌，這家為古城內的老店/原始據點。"}, {"name": "Akha Ama Phrasingh", "category": "food", "sub_tag": "清邁精品咖啡・老宅分店", "area": "古城區 (Old City)", "address": "175 2 Rachadamnoen Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7883802, "lng": 98.9832131}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7883802,98.9832131", "specialty": "阿卡族精品義式/手沖咖啡、黑糖拿鐵、冷萃咖啡", "desc": "位於帕辛寺斜對面，兩層樓木質質感設計極美，是清邁必朝聖的咖啡名店。"}, {"name": "Friend's Table (reservations required)", "category": "food", "sub_tag": "玻璃屋私廚 (需預約)", "area": "杭東區 (Hang Dong)", "address": "125, Hang Dong, Chiang Mai, 50230泰國", "coords": {"lat": 18.7033883, "lng": 98.9091995}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7033883,98.9091995", "specialty": "主廚季節性多道式無菜單料理 (Tasting Menu)", "desc": "位於主廚家玻璃屋內的預約制私廚，每晚僅接待約十餘位客人，融合亞洲與西式手法。"}, {"name": "GLeams GArden & COffee", "category": "food", "sub_tag": "花園麵食・咖啡簡餐", "area": "河畔/住宿周邊 (San Phi Suea)", "address": "9 1, San Phi Suea, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.849864399999998, "lng": 98.9885449}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.849864399999998,98.9885449", "specialty": "泰式酸辣麵 (Tom Yum)、釀豆腐麵 (Yen Ta Fo)、咖啡飲品", "desc": "距離 Granary 住宿很近的庭園風在地小店，環境綠意舒適，提供麵食與飲料。"}, {"name": "Baked by Win", "category": "food", "sub_tag": "無聲暖心烘焙坊・甜點", "area": "河畔/住宿周邊 (San Phi Suea)", "address": "200, 88 Soi Mu Ban Rim Nam, San Phi Suea, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.838480699999998, "lng": 99.0106982}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.838480699999998,99.0106982", "specialty": "蝶豆花餅乾怪獸蛋糕、熔岩巧克力蛋糕、手沖飲品", "desc": "由聽障烘焙師創立的暖心花園咖啡廳，可用手語圖卡點餐，蛋糕精緻美味。"}, {"name": "Mana's Best Mango Sticky Rice", "category": "food", "sub_tag": "專賣芒果糯米飯", "area": "古城區 (Old City)", "address": "เลขที่ หน้าโรงเรียนยุพราช Ratvithi Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7906549, "lng": 98.98928149999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7906549,98.98928149999999", "specialty": "現切香甜芒果糯米飯 (斑蘭/蝶豆花雙色糯米)", "desc": "古城區人氣芒果糯米飯小攤，芒果多汁甜度高，搭配溫熱椰漿糯米超滿足。"}, {"name": "Terroir Roasters", "category": "food", "sub_tag": "自家烘焙・精品咖啡", "area": "杭東區 (Hang Dong)", "address": "252, Nong Kwai, Hang Dong District, Chiang Mai 50230泰國", "coords": {"lat": 18.7247078, "lng": 98.922606}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7247078,98.922606", "specialty": "單品手沖咖啡、特製 Dirty 拿鐵、自家烘焙咖啡豆", "desc": "杭東區的專業咖啡烘焙工坊，豆子品質極佳，喜歡喝精品黑咖啡的必去。"}, {"name": "Wat Intharawat (Wat Ton Kwen)", "category": "attractions", "sub_tag": "經典蘭納木造古寺", "area": "杭東區 (Hang Dong)", "address": "PWFG+45F บ้านต้นเกว๋น ซอย 3 Nong Kwai, Hang Dong District, Chiang Mai 50230泰國", "coords": {"lat": 18.722841499999998, "lng": 98.9254437}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.722841499999998,98.9254437", "specialty": "百年經典柚木蘭納建築、泰劇《天生一對》取景地", "desc": "俗稱東昆寺 (Wat Ton Kwen)，保存極為完好的傳統蘭納木雕寺廟，拍照極美。"}, {"name": "Chai Lai Orchid Eco Lodge and Cafe", "category": "attractions", "sub_tag": "大象友善住宿・河畔咖啡", "area": "清邁市區", "address": "172 m 5 T. Mae Sapok A, Mae Wang District, Chiang Mai 50360泰國", "coords": {"lat": 18.658269699999998, "lng": 98.63375289999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.658269699999998,98.63375289999999", "specialty": "與獲救大象近距離互動、竹筏漂流、瀑布健行", "desc": "主打道德友善大象體驗（不騎乘），可預約早上叫大象來床邊吃早餐或河畔咖啡。"}, {"name": "Lanna Elephant Care", "category": "attractions", "sub_tag": "大象友善保護營", "area": "杭東區 (Hang Dong)", "address": "119/101 Hang Dong District, Chiang Mai 50230泰國", "coords": {"lat": 18.761949599999998, "lng": 98.8744802}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.761949599999998,98.8744802", "specialty": "餵食大象、幫大象洗澡、製作草藥營養球體驗", "desc": "距離市區較近的大象友善保護區，強調無虐待的互動與生態教育。"}, {"name": "Coconut Market", "category": "markets", "sub_tag": "週末限定・椰林文青市集", "area": "河畔/住宿周邊 (San Phi Suea)", "address": "94 หมู่ที่ 3 ซอย บ้านโต้ง 2, Fa Ham, Mueang Chiang Mai District, Chiang Mai 50000泰國", "coords": {"lat": 18.8177712, "lng": 99.0101074}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8177712,99.0101074", "specialty": "椰子樹林拍照打卡、手作雜貨、現剖椰子、泰式小吃", "desc": "週五至週日早上至下午營業，穿梭在高聳椰林與水溝造景間逛市集，氛圍悠閒。"}, {"name": "Proudproudproud", "category": "food", "sub_tag": "湄甘榜・溪畔森林咖啡", "area": "山區秘境 (Mae Kampong)", "address": "23 Mae On District, Chiang Mai 50130泰國", "coords": {"lat": 18.865852699999998, "lng": 99.3483818}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.865852699999998,99.3483818", "specialty": "山區手沖咖啡、芒果糯米飯、手工蛋糕", "desc": "位於湄甘榜村旁的小溪畔咖啡廳，坐在水邊聽流水聲喝咖啡，芬多精滿滿。"}, {"name": "美斯樂", "category": "attractions", "sub_tag": "清萊・泰北孤軍與茶鄉", "area": "清邁市區", "address": "57110泰國清萊府湄法鑾縣 Mae Salong Nok, 美斯樂", "coords": {"lat": 20.1862897, "lng": 99.59364629999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=20.1862897,99.59364629999999", "specialty": "烏龍茶園、雲南菜、泰北義民文史館", "desc": "注意：此地點位於「清萊府」（車程約 3.5-4 小時），為知名華人茶鄉聚落。"}, {"name": "黑森林餐廳", "category": "food", "sub_tag": "米其林推薦・森林瀑布景觀", "area": "杭東區 (Hang Dong)", "address": "Ratchapruek Rd, Nong Kwai, Hang Dong District, Chiang Mai 50230泰國", "coords": {"lat": 18.729941999999998, "lng": 98.9435826}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.729941999999998,98.9435826", "specialty": "酥炸鱸魚、泰式烤雞、鳳梨炒飯、冬陰功", "desc": "Khaomao-Khaofang 餐廳，整座餐廳打造成熱帶雨林與瀑布秘境，餐點水準也高。"}, {"name": "瓦洛洛市場", "category": "markets", "sub_tag": "清邁最大伴手禮・批發市場", "area": "瓦洛洛/湄濱河東岸", "address": "10,12, 14 Wichayanon Rd, Chang Moi Sub-district, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.789737799999997, "lng": 99.000695}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.789737799999997,99.000695", "specialty": "泰北香腸、炸豬皮、芒果乾、龍眼乾、手工藤編包", "desc": "買清邁土產與伴手禮的首選地！物美價廉，旁邊還有花市與唐人街。"}, {"name": "กาดวิวดอย : Kard View Doi", "category": "markets", "sub_tag": "在地美食小市集", "area": "寧曼商圈 (Nimman)", "address": "293 2 Chiang Rai Rd, Tambon Su Thep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.794868299999997, "lng": 98.96310629999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.794868299999997,98.96310629999999", "specialty": "平價泰式小吃、烤串、涼拌青木瓜、飲品", "desc": "素帖路周邊看得到山景的在地小型美食市集，價格親民接地氣。"}, {"name": "Siri Money Exchange, CURRENCY EXCHANGE.ร้านแลกเงิน สิริ มันนี่ เอ็กซ์เชนจ์", "category": "service", "sub_tag": "高匯率換匯所", "area": "清邁市區", "address": "61 Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7838575, "lng": 98.9903976}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7838575,98.9903976", "specialty": "台幣 (TWD)/美金兌換泰銖 (建議帶大鈔與護照)", "desc": "長康路附近口碑良好的換匯所，通常匯率優於機場與銀行。"}, {"name": "Copenn Chiangmai", "category": "spa", "sub_tag": "泰版 Aesop・質感香氛", "area": "寧曼商圈 (Nimman)", "address": "24 9 2nd floor Tambon Su Thep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7948614, "lng": 98.96851389999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7948614,98.96851389999999", "specialty": "極簡木質/泥土調香水、擴香石、香氛蠟燭、清邁限定線香", "desc": "泰國當紅高級小眾香氛品牌，位於寧曼路 17 巷 Roast8ry 旗艦店二樓，非常有設計感。"}, {"name": "V Secret Vegan", "category": "food", "sub_tag": "純素泰式街頭美食", "area": "瓦洛洛/湄濱河東岸", "address": "28/3-4 Changklan Rd, Tambon Chang Moi, Mueang Chiang Mai District, Chiang Mai 50100泰國", "coords": {"lat": 18.7868697, "lng": 99.00048729999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7868697,99.00048729999999", "specialty": "純素泰北料理、天貝波菜咖哩、香草豆腐沙拉", "desc": "主打創意又道地的植物性泰式家常菜，盛裝在香蕉葉木盤上，清爽無負擔。"}, {"name": "Ruen Tamarind Restaurant", "category": "food", "sub_tag": "池畔泰北飯店餐廳", "area": "古城區 (Old City)", "address": "50 Rachadamnoen Rd Soi 1, Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.78857, "lng": 98.9897846}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.78857,98.9897846", "specialty": "蘭納風味家常菜、泰北傳統拼盤、精緻泰式簡餐", "desc": "位於知名精品飯店 Tamarind Village 內，在百年羅望子樹與泳池旁優雅用餐。"}, {"name": "Herb Basics", "category": "spa", "sub_tag": "清邁必買・草本保養伴手禮", "area": "古城區 (Old City)", "address": "174 Prapokklao Road, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7884284, "lng": 98.9880213}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7884284,98.9880213", "specialty": "香茅精油、草本護手霜、護唇膏、按摩油", "desc": "清邁在地的國民天然草本品牌，價格實惠、包裝精緻，買來當伴手禮送人超適合。"}, {"name": "Mae Kha Canal", "category": "attractions", "sub_tag": "清邁小樽・夜間水岸散步", "area": "清邁市區", "address": "9 Sridonchai Rd, Haiya Sub-district, Mueang Chiang Mai District, Chiang Mai 50100泰國", "coords": {"lat": 18.777065699999998, "lng": 98.9955681}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.777065699999998,98.9955681", "specialty": "日式造景運河步道、文青文創小攤、路邊小吃", "desc": "整治後爆紅的運河步道，傍晚點燈後兩旁有許多日系小店與攤販，適合散步拍照。"}, {"name": "真心茶屋", "category": "food", "sub_tag": "日式禪風・抹茶專賣", "area": "瓦洛洛/湄濱河東岸", "address": "191/1 Sridonchai Rd, Chang Khlan Sub-district, Mueang Chiang Mai District, Chang Wat Chiang Mai 50100泰國", "coords": {"lat": 18.7812993, "lng": 99.00124129999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7812993,99.00124129999999", "specialty": "日本直送職人手刷抹茶、抹茶生乳捲、抹茶聖代、焙茶", "desc": "Magokoro Teahouse，擁有枯山水日式庭園與和室空間，清邁最紅的抹茶甜點屋。"}, {"name": "週五雲南早市", "category": "markets", "sub_tag": "週五限定・穆斯林早市", "area": "瓦洛洛/湄濱河東岸", "address": "ท่าแพ ซอย 1 Chang Khlan Sub-district, Mueang Chiang Mai District, Chiang Mai 50100泰國", "coords": {"lat": 18.787469299999998, "lng": 98.9998789}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.787469299999998,98.9998789", "specialty": "雲南米線、炸烤餅、牛肉串、新鮮蔬果香料", "desc": "僅每週五清晨營業的百年傳統市集（Ban Haw），充滿濃濃伊斯蘭與雲南市井風情。"}, {"name": "Garden to Table Chiangmai", "category": "food", "sub_tag": "無味精・有機農場餐桌", "area": "古城區 (Old City)", "address": "136 4 Ratchapakhinai Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7865085, "lng": 98.9904282}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7865085,98.9904282", "specialty": "自種有機蔬菜泰北料理、無味精少糖家常菜", "desc": "僅於晚上營業的溫馨有機廚房，食材摘自自家花園，提供無負擔的純淨泰菜。"}, {"name": "Thai Food Good Taste - Chiang Mai", "category": "food", "sub_tag": "古城平價泰菜", "area": "古城區 (Old City)", "address": "Rachadamnoen Rd, Tambon Si Phum, เมือง Chiang Mai 50200泰國", "coords": {"lat": 18.7883228, "lng": 98.9868224}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7883228,98.9868224", "specialty": "泰式炒河粉 (Pad Thai)、泰北金麵、冬陰功湯", "desc": "週日夜市主幹道上的平價泰式餐廳，交通便利、菜色經典道地。"}, {"name": "Zira Spa", "category": "spa", "sub_tag": "古城奢華・古法 SPA", "area": "古城區 (Old City)", "address": "8, 1 Ratvithi Rd, Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7904774, "lng": 98.99289519999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7904774,98.99289519999999", "specialty": "蘭納古式按摩、熱石芳療、草藥球熱敷 (需預約)", "desc": "古城區評價極高的高質感 Spa 館，環境宛如傳統蘭納宮殿，服務細膩。"}, {"name": "TEMPT cafe&brunch", "category": "food", "sub_tag": "古城網美早午餐", "area": "古城區 (Old City)", "address": "Ratchapakhinai Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7919892, "lng": 98.99002399999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7919892,98.99002399999999", "specialty": "班尼迪克蛋、法式吐司、酪梨酸種麵包、精品咖啡", "desc": "古城內裝潢時髦的西式早午餐咖啡廳，想換換口味吃西式早餐的好選擇。"}, {"name": "Ton Lam Yai Market", "category": "markets", "sub_tag": "24H 在地鮮花與批發市場", "area": "瓦洛洛/湄濱河東岸", "address": "88/1 Wichayanon Rd, Chang Moi Sub-district, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.7902745, "lng": 99.0013087}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7902745,99.0013087", "specialty": "鮮花花環、傳統泰式點心、熱帶水果", "desc": "緊鄰瓦洛洛市場與萍河，是清邁最熱鬧的 24 小時鮮花市場與在地早市。"}, {"name": "Ming Muang Market", "category": "markets", "sub_tag": "古城在地早市", "area": "古城區 (Old City)", "address": "131/3 Mun Mueang Rd, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50300泰國", "coords": {"lat": 18.7916557, "lng": 98.9932032}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7916557,98.9932032", "specialty": "傳統泰式早餐、炸豬皮、現切水果、熟食便當", "desc": "位於古城塔佩門北側的在地傳統市場，想體驗清邁人日常買菜買早餐必來。"}, {"name": "Mae Kampong Village", "category": "attractions", "sub_tag": "泰北百年高山慢活村", "area": "山區秘境 (Mae Kampong)", "address": "V982+695, Huai Kaeo, Mae On District, Chiang Mai 50130泰國", "coords": {"lat": 18.8655073, "lng": 99.35098459999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8655073,99.35098459999999", "specialty": "山谷木屋聚落、發酵茶葉文化、瀑布咖啡廳", "desc": "海拔約 1300 公尺的避暑山村，四季涼爽、保留純樸泰北風貌，適合安排半日或一日遊。"}, {"name": "Kuaytiaw 3 Baht", "category": "food", "sub_tag": "銅板價・3泰銖船麵", "area": "瓦洛洛/湄濱河東岸", "address": "R225+JRM, Rattanakosin Soi 1, Tambon Wat Ket, Mueang Chiang Mai District, Chiang Mai 50000泰國", "coords": {"lat": 18.801571799999998, "lng": 99.0095923}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.801571799999998,99.0095923", "specialty": "迷你碗泰式船麵 (3泰銖/碗)、炸雲吞、泰式沙嗲串", "desc": "清邁超有趣的歷史老店，每碗只要 3 泰銖（一口份量），大家通常一次點 10 碗堆成塔。"}, {"name": "Baan Suan Café", "category": "food", "sub_tag": "山谷叢林系咖啡廳", "area": "清邁市區", "address": "170 หมู่ที่ 3 ถนน แม่เหียะ-บ้านปง Mae Hia, Mueang Chiang Mai District, Chiang Mai 50100泰國", "coords": {"lat": 18.7595737, "lng": 98.9137356}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7595737,98.9137356", "specialty": "泰式簡餐 (炒河粉/冬陰功)、冰咖啡、花草茶", "desc": "隱藏在西南方山谷樹林中的原始秘境咖啡館，充滿綠意與鳥鳴，適合順遊放鬆。"}, {"name": "OHB Cafe and Meal - Chiang Mai", "category": "food", "sub_tag": "熱帶花園咖啡・烘焙簡餐", "area": "瓦洛洛/湄濱河東岸", "address": "88/8 ถนน บำรุงราษฎร์ Wat Ket, Mueang Chiang Mai District, Chiang Mai 50000泰國", "coords": {"lat": 18.790176199999998, "lng": 99.0088756}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.790176199999998,99.0088756", "specialty": "黑巧克力覆盆子蛋糕、精品咖啡、泰北/西式早午餐", "desc": "被熱帶植物與水池包圍的質感玻璃屋，甜點水準高，適合午後來發呆放空。"}, {"name": "Phailin Tok sen massage", "category": "spa", "sub_tag": "傳統蘭納・木槌敲穴按摩", "area": "古城區 (Old City)", "address": "20 Rachadamnoen Rd Soi 1, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7892109, "lng": 98.99220609999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7892109,98.99220609999999", "specialty": "泰北古法木槌敲打經絡按摩 (Tok Sen)、泰式舒壓", "desc": "專門體驗清邁獨有「Tok Sen」木槌按摩的小店，透過木槌共振深層放鬆緊繃肌肉。"}, {"name": "Ziri Massage and Spa", "category": "spa", "sub_tag": "古城高評價按摩 SPA", "area": "古城區 (Old City)", "address": "Ratchapakhinai Rd, Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.786741799999998, "lng": 98.9902898}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.786741799999998,98.9902898", "specialty": "泰式古法按摩、精油舒壓、足部按摩", "desc": "古城區環境整潔舒適、技師手法專業的高人氣按摩店，逛累了隨時來按一小時。"}, {"name": "Shan State food", "category": "food", "sub_tag": "撣邦 (Tai Yai) 特色料理", "area": "清邁市區", "address": "Q2PW+3XC, San Klang, San Kamphaeng District, Chiang Mai 50130泰國", "coords": {"lat": 18.785190999999998, "lng": 99.04740299999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.785190999999998,99.04740299999999", "specialty": "撣邦黃薑飯、傳統碗豆粉麵 (Hto Hpu Nu)、泰北撣邦咖哩", "desc": "在清邁體驗少見的緬甸撣邦少數民族料理，香料風味獨特，就在 Meena 附近。"}, {"name": "ครัวอ้อยใจ Aoyjai Kitchen", "category": "food", "sub_tag": "古城巷弄・隱藏泰菜", "area": "古城區 (Old City)", "address": "Phra Pok Klao Rd Soi 4, Tambon Phra Sing, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7833619, "lng": 98.98737489999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7833619,98.98737489999999", "specialty": "濃郁冬陰功湯、泰式熱炒打拋豬、泰式煎蛋", "desc": "ครัวอ้อยใจ，藏在巷弄裡的超迷你小店，味道極佳且平價，經常需要稍微候位。"}, {"name": "Angkaew Reservoir", "category": "attractions", "sub_tag": "清邁大學・靜心湖畔", "area": "寧曼商圈 (Nimman)", "address": "RX42+99C, Sukhothai 5 Alley, Tambon Su Thep, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.8065843, "lng": 98.9517827}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8065843,98.9517827", "specialty": "素帖山倒映湖面的夕陽美景、當地人散步野餐地", "desc": "清邁大學校內的絕美蓄水湖，傍晚時分金黃夕陽灑在湖面與山景上，非常浪漫。"}, {"name": "สุขพอดี - Simply Happy", "category": "food", "sub_tag": "百年老樹下・森林咖啡", "area": "瓦洛洛/湄濱河東岸", "address": "Osathaphan Rd, Tambon Wat Ket, Mueang Chiang Mai District, Chiang Mai 50000泰國", "coords": {"lat": 18.7837718, "lng": 99.00662539999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7837718,99.00662539999999", "specialty": "招牌鮮橙美式 (Orange Coffee)、三色特調 (Trio)、手沖咖啡", "desc": "สุขพอดี，位於河東老社區百年大樹下的木屋咖啡廳，環境清幽宛如都市綠洲。"}, {"name": "AT KHUA LEK Cafe & Restaurant", "category": "food", "sub_tag": "萍河畔・駐唱景觀餐廳", "area": "瓦洛洛/湄濱河東岸", "address": "Wat Ket, Mueang Chiang Mai District, Chiang Mai 50000泰國", "coords": {"lat": 18.783294899999998, "lng": 99.0052214}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.783294899999998,99.0052214", "specialty": "泰北料理、泰式熱炒、早午餐、調酒與咖啡", "desc": "位於鐵橋旁的鵝黃色河景餐廳，傍晚吹河風吃泰菜，晚上還有 Live Band 駐唱。"}, {"name": "Light Beverage and MORE", "category": "food", "sub_tag": "萍河畔・貓咪咖啡廳", "area": "瓦洛洛/湄濱河東岸", "address": "343/2 Charoen Prathet Rd, Chang Khlan Sub-district, Amphoe Mueang Chiang Mai, Chiang Mai 50100泰國", "coords": {"lat": 18.7693892, "lng": 99.00148399999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7693892,99.00148399999999", "specialty": "精品咖啡、特調飲品、手工甜點", "desc": "萍河畔的白色極簡木屋咖啡館，有許多親人的店貓陪伴，邊喝咖啡邊看河景超療癒。"}, {"name": "清邁夜市", "category": "markets", "sub_tag": "每日營業・長康路夜市", "area": "清邁市區", "address": "", "coords": {"lat": 18.7852244, "lng": 99.0002986}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7852244,99.0002986", "specialty": "大象褲、手工藝品、泰式小吃攤、現場音樂廣場", "desc": "Chiang Mai Night Bazaar，每天晚上都熱鬧滾滾的大型觀光夜市，好逛又好買。"}, {"name": "Khao Soi Khun Yai", "category": "food", "sub_tag": "傳奇必吃・老奶奶金麵", "area": "古城區 (Old City)", "address": "QXWM+47J, Sri Poom 8 Alley, Tambon Si Phum, Mueang Chiang Mai District, Chiang Mai 50200泰國", "coords": {"lat": 18.7953334, "lng": 98.9831462}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.7953334,98.9831462", "specialty": "招牌泰北牛肉/雞肉金麵 (Khao Soi)", "desc": "清邁最傳奇的隱藏版老奶奶金麵！只在中午營業，賣完就收，湯頭濃郁一絕。"}, {"name": "KUNG YIM", "category": "food", "sub_tag": "泰國大頭蝦・海鮮吃到飽", "area": "清邁市區", "address": "", "coords": {"lat": 18.8038596, "lng": 98.97477219999999}, "maps_url": "https://www.google.com/maps/search/?api=1&query=18.8038596,98.97477219999999", "specialty": "炭烤泰國大頭蝦、螃蟹、泰式海鮮熱炒、泰奶冰", "desc": "愛吃蝦必去！提供專人代烤或自烤的泰國蝦吃到飽與單點套餐，新鮮過癮。"}]};
 
-    // Reference Coordinates
     const COORDS_REF = {
-      bed: { lat: 18.7880, lng: 98.9825 },      // BED Phrasingh
-      granary: { lat: 18.8471, lng: 98.9869 }   // The Granary Resort
+      bed: { lat: 18.7880, lng: 98.9825 },
+      granary: { lat: 18.8471, lng: 98.9869 }
     };
 
     let userLocation = null;
-    let activeDistanceRef = 'gps'; // 'gps', 'bed', 'granary'
+    let activeDistanceRef = 'gps';
     let currentFoodFilter = 'all';
+    let currentSearchTerm = '';
     let isFoodCarousel = true;
 
-    // Haversine formula to compute distance in km
     function calculateDistance(lat1, lon1, lat2, lon2) {
       if (!lat1 || !lon1 || !lat2 || !lon2) return null;
-      const R = 6371; // Earth radius in km
+      const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
       const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -288,7 +284,7 @@
     function getActiveReferenceCoords() {
       if (activeDistanceRef === 'bed') return COORDS_REF.bed;
       if (activeDistanceRef === 'granary') return COORDS_REF.granary;
-      return userLocation || COORDS_REF.bed; // fallback to BED if GPS pending
+      return userLocation || COORDS_REF.bed;
     }
 
     function getDistanceString(coords) {
@@ -300,7 +296,6 @@
       return `${refLabel} 約 ${dist < 1 ? Math.round(dist * 1000) + ' 公尺' : dist.toFixed(1) + ' 公里'}`;
     }
 
-    // Geolocation Setup
     function initGPS() {
       const statusEl = document.getElementById('gps-status');
       if ('geolocation' in navigator) {
@@ -312,7 +307,6 @@
             renderAttractions();
           },
           (err) => {
-            console.log('GPS unavailable, fallback to hotel reference');
             statusEl.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-amber-400"></span> 測距基準：帕辛飯店`;
           },
           { enableHighAccuracy: true, timeout: 8000 }
@@ -322,14 +316,12 @@
       }
     }
 
-    // Distance reference change
     function changeDistanceRef(val) {
       activeDistanceRef = val;
       renderFood();
       renderAttractions();
     }
 
-    // Navigation Tab Switching
     function switchTab(tabId) {
       document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -347,7 +339,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Toggle Food View (Carousel vs List)
     function toggleFoodView() {
       isFoodCarousel = !isFoodCarousel;
       const carouselView = document.getElementById('food-carousel-view');
@@ -365,7 +356,11 @@
       }
     }
 
-    // Food Rendering
+    function onSearchInput(val) {
+      currentSearchTerm = val.trim().toLowerCase();
+      renderFood();
+    }
+
     function filterFood(filter) {
       currentFoodFilter = filter;
       document.querySelectorAll('.food-filter-btn').forEach(btn => {
@@ -380,43 +375,63 @@
     function renderFood() {
       const foodItems = TRIP_DATA.places.filter(p => p.category === 'food' || p.category === 'service');
       const filtered = foodItems.filter(p => {
+        if (currentSearchTerm) {
+          const hay = `${p.name} ${p.sub_tag} ${p.specialty} ${p.desc} ${p.area}`.toLowerCase();
+          if (!hay.includes(currentSearchTerm)) return false;
+        }
         if (currentFoodFilter === 'all') return true;
+        if (currentFoodFilter === 'michelin') return p.sub_tag.includes('米其林');
+        if (currentFoodFilter === 'cafe') return p.sub_tag.includes('咖啡') || p.sub_tag.includes('茶') || p.sub_tag.includes('甜點') || p.sub_tag.includes('可可') || p.sub_tag.includes('煎餅') || p.sub_tag.includes('烘焙') || p.sub_tag.includes('早午餐');
+        if (currentFoodFilter === 'noodle') return p.sub_tag.includes('金麵') || p.sub_tag.includes('泰北') || p.sub_tag.includes('泰菜');
         if (currentFoodFilter === p.area) return true;
-        if (currentFoodFilter === p.sub_tag) return true;
         return false;
       });
 
       document.getElementById('food-count').innerText = `${filtered.length} 間`;
 
-      // Render Carousel Cards
       const carousel = document.getElementById('food-carousel');
-      carousel.innerHTML = filtered.map((item, idx) => `
+      const list = document.getElementById('food-list-view');
+
+      if (filtered.length === 0) {
+        carousel.innerHTML = `<div class="w-full text-center py-10 text-slate-400 text-sm">找不到符合條件的餐廳，試試看其他關鍵字！</div>`;
+        list.innerHTML = `<div class="w-full text-center py-10 text-slate-400 text-sm">找不到符合條件的餐廳！</div>`;
+        return;
+      }
+
+      carousel.innerHTML = filtered.map(item => `
         <div class="snap-card min-w-[85vw] max-w-[88vw] bg-slate-800/90 border border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between shadow-xl space-y-3">
-          <div class="space-y-2">
+          <div class="space-y-2.5">
             <div class="flex items-start justify-between gap-2">
-              <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                ${item.sub_tag || '人氣美食'}
+              <span class="text-[10px] font-bold tracking-wide px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                ${item.sub_tag}
               </span>
-              <span class="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+              <span class="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">
                 ${getDistanceString(item.coords)}
               </span>
             </div>
             
-            <h3 class="text-lg font-bold text-white tracking-tight leading-snug">
-              ${item.name}
-            </h3>
-
-            <div class="text-xs text-slate-300 flex items-center gap-1">
-              <span>📍</span>
-              <span class="text-orange-300 font-medium">${item.area}</span>
+            <div>
+              <h3 class="text-lg font-bold text-white tracking-tight leading-snug">
+                ${item.name}
+              </h3>
+              <div class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                <span>📍</span>
+                <span class="text-orange-300 font-medium">${item.area}</span>
+              </div>
             </div>
 
-            <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed bg-slate-900/50 p-2.5 rounded-xl border border-slate-700/40">
-              ${item.address}
+            <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-2.5 space-y-1">
+              <p class="text-[11px] font-bold text-amber-400">🍽️ 主打必點 / 賣什麼：</p>
+              <p class="text-xs text-slate-100 font-medium leading-relaxed">${item.specialty}</p>
+            </div>
+
+            <p class="text-xs text-slate-300 leading-relaxed">
+              💡 ${item.desc}
             </p>
           </div>
 
-          <div class="pt-2">
+          <div class="pt-1 space-y-2">
+            <p class="text-[10px] text-slate-500 truncate">地址：${item.address}</p>
             <a href="${item.maps_url}" target="_blank" class="w-full py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 active:scale-95 transition">
               <span>🧭</span>
               <span>開啟 Google 地圖導航</span>
@@ -425,26 +440,28 @@
         </div>
       `).join('');
 
-      // Render List View
-      const list = document.getElementById('food-list-view');
       list.innerHTML = filtered.map(item => `
-        <div class="bg-slate-800/80 border border-slate-700/70 p-3.5 rounded-xl flex items-center justify-between gap-3 shadow-md">
-          <div class="space-y-1 flex-1 min-w-0">
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400 font-medium">${item.area}</span>
-              <span class="text-[10px] text-emerald-400">${getDistanceString(item.coords)}</span>
+        <div class="bg-slate-800/80 border border-slate-700/70 p-3.5 rounded-xl space-y-2 shadow-md">
+          <div class="flex items-start justify-between gap-2">
+            <div class="space-y-1 flex-1 min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 font-medium">${item.sub_tag}</span>
+                <span class="text-[10px] text-emerald-400 font-medium">${getDistanceString(item.coords)}</span>
+              </div>
+              <h4 class="text-sm font-bold text-white">${item.name}</h4>
             </div>
-            <h4 class="text-sm font-bold text-white truncate">${item.name}</h4>
-            <p class="text-[11px] text-slate-400 truncate">${item.address}</p>
+            <a href="${item.maps_url}" target="_blank" class="shrink-0 px-3 py-2 bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border border-orange-500/30 rounded-xl text-xs font-medium active:scale-90 transition flex items-center gap-1">
+              🧭 導航
+            </a>
           </div>
-          <a href="${item.maps_url}" target="_blank" class="shrink-0 p-2.5 bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border border-orange-500/30 rounded-xl text-center active:scale-90 transition">
-            🧭
-          </a>
+          <div class="text-xs text-amber-300/90 bg-slate-900/50 p-2 rounded-lg border border-slate-700/40">
+            <span class="font-bold text-amber-400">賣什麼：</span>${item.specialty}
+          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed">${item.desc}</p>
         </div>
       `).join('');
     }
 
-    // Attractions & Markets Rendering
     let currentAttrFilter = 'all';
     function filterAttraction(filter) {
       currentAttrFilter = filter;
@@ -469,7 +486,7 @@
         <div class="bg-slate-800/80 border border-slate-700/70 rounded-2xl p-4 space-y-3 shadow-lg">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                 ${item.sub_tag}
               </span>
               <h3 class="text-base font-bold text-white mt-1.5">${item.name}</h3>
@@ -479,9 +496,10 @@
             </span>
           </div>
 
-          <p class="text-xs text-slate-300 bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/40">
-            📍 ${item.address}
-          </p>
+          <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/40 space-y-1">
+            <p class="text-xs text-amber-300 font-medium">✨ 重點特色：${item.specialty}</p>
+            <p class="text-[11px] text-slate-300 leading-relaxed">${item.desc}</p>
+          </div>
 
           <a href="${item.maps_url}" target="_blank" class="w-full py-2 bg-slate-700 hover:bg-slate-600 text-slate-100 font-medium text-xs rounded-xl flex items-center justify-center gap-1.5 active:scale-95 transition">
             <span>🗺️ 查看 Google 地圖位置</span>
@@ -490,7 +508,6 @@
       `).join('');
     }
 
-    // Hotel Rendering
     function renderHotels() {
       const container = document.getElementById('hotel-list');
       container.innerHTML = TRIP_DATA.hotel_info.map((h, idx) => `
@@ -508,7 +525,6 @@
             <p class="text-[11px] text-slate-400">${h.room_type}</p>
           </div>
 
-          <!-- Thai Address Card for Taxi/Grab Driver -->
           <div class="bg-slate-900/80 border border-amber-500/30 p-3 rounded-xl space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="text-[11px] font-bold text-amber-400 flex items-center gap-1">
@@ -550,12 +566,10 @@
       `).join('');
     }
 
-    // Flight Rendering
     function renderFlights() {
       const f = TRIP_DATA.flight_info;
       const container = document.getElementById('flight-container');
       container.innerHTML = `
-        <!-- 去程航班 -->
         <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-4 space-y-3 shadow-xl">
           <div class="flex items-center justify-between border-b border-slate-700/60 pb-2.5">
             <div class="flex items-center gap-2">
@@ -597,7 +611,6 @@
           </div>
         </div>
 
-        <!-- 回程航班 -->
         <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-4 space-y-3 shadow-xl">
           <div class="flex items-center justify-between border-b border-slate-700/60 pb-2.5">
             <div class="flex items-center gap-2">
@@ -642,7 +655,6 @@
       `;
     }
 
-    // Thai Food Menu Glossary Rendering
     function renderMenu() {
       const container = document.getElementById('menu-glossary');
       container.innerHTML = TRIP_DATA.thai_menu.map(item => `
@@ -668,13 +680,11 @@
       `).join('');
     }
 
-    // PWA Modal Helper
     function togglePwaPrompt() {
       const modal = document.getElementById('pwa-modal');
       modal.classList.toggle('hidden');
     }
 
-    // Initialize Page
     document.addEventListener('DOMContentLoaded', () => {
       initGPS();
       renderFood();
